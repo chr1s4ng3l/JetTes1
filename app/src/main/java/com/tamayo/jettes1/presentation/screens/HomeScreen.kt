@@ -1,6 +1,6 @@
 package com.tamayo.jettes1.presentation.screens
 
-import android.os.Build.VERSION.SDK_INT
+import android.graphics.ImageDecoder
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -27,32 +27,37 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
+import coil.size.Size
+import com.tamayo.jettes1.data.model.Original
 import com.tamayo.jettes1.domain.DomainData
 import com.tamayo.jettes1.presentation.MyViewModel
 import com.tamayo.jettes1.utils.UIState
 
 @Composable
-fun HomeScreen(vm: MyViewModel) {
- val context = LocalContext.current
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(horizontal = 8.dp)) {
+fun HomeScreen(vm: MyViewModel = hiltViewModel()) {
+
+    val context = LocalContext.current
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 8.dp)
+    ) {
 
         SearchView(vm = vm)
 
         when (val dataGift = vm.data.collectAsState().value) {
             is UIState.ERROR -> {
                 Toast.makeText(context, "An error occurred", Toast.LENGTH_SHORT).show()
-
             }
 
             is UIState.LOADING -> {
-                Toast.makeText(context, "Wait a moment Loading gift", Toast.LENGTH_SHORT).show()
             }
 
             is UIState.SUCCESS -> {
@@ -91,26 +96,13 @@ fun MyGiphy(data: DomainData) {
 
 
         val imageLoader = ImageLoader.Builder(LocalContext.current)
-            .components {
-                if (SDK_INT >= 28) {
-                    add(ImageDecoderDecoder.Factory())
-                } else {
-                    add(GifDecoder.Factory())
-                }
-            }
-            .build()
+            .components { add(ImageDecoderDecoder.Factory()) }.build()
 
         Image(
-            modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
             painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current)
-                    .data(data = data.images?.original?.url)
-                    .apply(block = fun ImageRequest.Builder.() {
-                        size(coil.size.Size.ORIGINAL)
-                    }).build(),
-                imageLoader = imageLoader
-            ),
-            contentDescription = "image",
+                ImageRequest.Builder(LocalContext.current).data(data.images?.original?.url ?: "")
+                    .size(Size.ORIGINAL).build(), imageLoader = imageLoader
+            ), contentDescription = "Gif"
         )
 
     }
@@ -121,7 +113,11 @@ fun MyGiphy(data: DomainData) {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SearchView(vm: MyViewModel) {
+
+    val context = LocalContext.current
+
     val query = vm.tag.collectAsState()
+
     var error by remember {
         mutableStateOf(false)
     }
@@ -140,17 +136,17 @@ fun SearchView(vm: MyViewModel) {
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(
             onDone = {
-                if (query.value.isEmpty()){
+                if (query.value.isEmpty()) {
                     error = true
-                }else{
+                } else {
                     error = false
                     vm.getData(query.value)
                     keyboardController?.hide()
-
+                    Toast.makeText(context, "Wait a moment Loading gift", Toast.LENGTH_SHORT).show()
                 }
             }
         )
 
-        )
+    )
 
 }

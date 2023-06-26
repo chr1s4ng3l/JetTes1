@@ -95,8 +95,6 @@ dependencies {
     kapt 'com.google.dagger:hilt-android-compiler:2.45'
     implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
 
-
-
     // ViewModel
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
@@ -106,7 +104,6 @@ dependencies {
      * Docs: https://coil-kt.github.io/coil/api/coil/index.html
      */
     implementation "io.coil-kt:coil-compose:2.2.2"
-    //Coil gift
     implementation("io.coil-kt:coil-gif:2.4.0")
 
 }

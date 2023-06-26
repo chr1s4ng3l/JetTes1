@@ -27,7 +27,6 @@ class MyRepositoryImpl @Inject constructor(
 
             val response = serviceApi.getData(tag)
 
-
             if (response.isSuccessful) {
                 response.body()?.let {
                     emit(UIState.SUCCESS(it.data.mapToDomain()))
